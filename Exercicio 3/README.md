@@ -1,15 +1,39 @@
-3. Listando e removendo containers
+# 🚀 Listando e Removendo Containers Docker
 
-Liste todos os containers em execução e parados, pare um container em execução e remova um container específico.
+Passo a passo para **listar containers**, **parar containers em execução** e **remover containers específicos** utilizando comandos Docker.
 
-1 para listar todos os containers use os seguintes comando
+---
 
+## 📋 1. Liste todos os containers
+
+Use o comando abaixo para listar **todos os containers**, incluindo os que estão parados:
+
+```bash
 docker ps -a
+```
 
-2 - use o comando remove e o id do container para removelo, no exemplo removi um container ubuntu parado 
+---
 
-docker remove 445e3d58d909
+## 🗑️ 2. Remova um container parado
 
-3 - use o comando kill e o id do container para para-lo, no exemplo parei um container nginx em execução 
+Para remover um container, use o comando `docker rm` seguido do **ID** ou **nome do container**.  
+No exemplo abaixo, estamos removendo um container Ubuntu que está parado:
 
-docker remove 36d433b72d45
+```bash
+docker rm 445e3d58d909
+```
+
+---
+
+## 🛑 3. Pare um container em execução
+
+Para parar um container ativo, use o comando `docker kill` seguido do ID.  
+No exemplo, estamos parando um container com Nginx em execução:
+
+```bash
+docker kill 36d433b72d45
+```
+
+---
+
+✅ Após esses comandos, os containers removidos não aparecerão mais em `docker ps -a` e os containers parados deixarão de ocupar recursos do sistema.
