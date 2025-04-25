@@ -11,6 +11,7 @@ Use o comando abaixo para listar **todos os containers**, incluindo os que estã
 ```bash
 docker ps -a
 ```
+![Captura de Tela (32)](https://github.com/user-attachments/assets/168f29d5-61c4-4237-a0b4-9fd85e6969ba)
 
 ---
 
@@ -22,6 +23,7 @@ No exemplo abaixo, estamos removendo um container Ubuntu que está parado:
 ```bash
 docker rm 445e3d58d909
 ```
+![Captura de Tela (33)](https://github.com/user-attachments/assets/1a8b9dd3-f061-4093-a681-bc529a201673)
 
 ---
 
@@ -33,6 +35,7 @@ No exemplo, estamos parando um container com Nginx em execução:
 ```bash
 docker kill 36d433b72d45
 ```
+![Captura de Tela (35)](https://github.com/user-attachments/assets/584dd185-5c4e-483d-8dec-cd6cc8471f26)
 
 ---
 
