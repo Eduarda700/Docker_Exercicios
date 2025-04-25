@@ -1,25 +1,78 @@
-Criando um Dockerfile para uma aplicação simples em Python
+# 🚀 Criando um Dockerfile para uma Aplicação Flask em Python
 
-Crie um Dockerfile para uma aplicação Flask que retorna uma mensagem ao acessar um endpoint, para isso utilize o projeto Docker Flask
+Passo a passo para criar um **Dockerfile** que empacota uma aplicação simples com **Flask**, usando a imagem **Python:3.13-alpine** e recursos de cache para instalação eficiente de dependências.
 
-1 - baixe os arquivos compose,requirement.txt e app.py
+---
 
-2 - crie um Dockerfile com uma imagem phyton, a minha escolhida foi phyton:3.13 alpine linux, com o parametro --platform=$BUILDPLATFORM para garantir garante que a imagem seja construída para a plataforma de build atual
+## 📥 1. Baixe os arquivos do projeto
 
-3 - O WORKDIR /app define o diretório de trabalho dentro do contêiner como /app e COPY requirements.txt /app copia o arquivo requirements.txt para o diretório /app no contêiner.
+Faça o download dos arquivos necessários:
 
-4 - RUN --mount=type=cache,target=/root/.cache/pip \
-    pip3 install -r requirements.txt Essa instrução instala as dependências listadas em requirements.txt utilizando o pip, o --mount=type=cache permite que o cache do pip seja reutilizado entre builds, acelerando o processo de instalação.
-5 - COPY app.py /app
+- `docker-compose.yml`
+- `requirements.txt`
+- `app.py`
 
+Você pode usar o repositório de exemplo [Docker Flask](https://github.com/docker-library/python/tree/master/3.13/alpine).
+
+---
+
+## 🐳 2. Crie o Dockerfile
+
+Crie um arquivo chamado `Dockerfile` com o conteúdo abaixo:
+
+```dockerfile
+# Use a imagem Python com Alpine Linux e defina a plataforma de build
+FROM --platform=$BUILDPLATFORM python:3.13-alpine
+
+# Defina o diretório de trabalho no container
+WORKDIR /app
+
+# Copie o arquivo de dependências
+COPY requirements.txt /app
+
+# Instale as dependências usando cache para acelerar builds
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -r requirements.txt
+
+# Copie o código da aplicação
+COPY app.py /app
+
+# Defina o ponto de entrada e o comando padrão
 ENTRYPOINT ["python3"]
 CMD ["app.py"]
 
-
+# Exponha a porta usada pela aplicação Flask
 EXPOSE 8000
+```
 
-use docker compose -d para montar o projeto 
-![Captura de Tela (38)](https://github.com/user-attachments/assets/f635b578-c57d-4808-9b2d-ca9e4fb56390)
+---
 
-![Captura de Tela (39)](https://github.com/user-attachments/assets/0a1e0029-d82c-4414-8178-040c0aaaed6c)
+## ▶️ 3. Rode a aplicação com Docker Compose
+
+Use o seguinte comando para montar e iniciar o projeto em modo desanexado:
+
+```bash
+docker compose up -d
+```
+![Captura de Tela (38 5)](https://github.com/user-attachments/assets/c10b7810-fb8c-4405-b491-f574a3c9365b)
+
+---
+
+## 🌐 4. Acesse a aplicação
+
+Abra o navegador e acesse:
+
+```bash
+http://localhost:8000
+```
+
+Você verá a mensagem retornada pelo endpoint Flask.
+
+![Captura de Tela (39)](https://github.com/user-attachments/assets/1e0579d4-b37b-4026-9682-e4193b93b4ae)
+
+---
+
+✅ Agora você tem uma aplicação Flask empacotada em um container Docker leve e eficiente!
+
+
 
