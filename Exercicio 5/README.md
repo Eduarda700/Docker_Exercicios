@@ -96,7 +96,7 @@ docker-compose up -d mysql
 ### c. Verifique os dados:
 
 ```bash
-docker exec -it mysql mysql -uroot -p123456 -e "SELECT * FROM mydb.users"
+docker exec -it exercicio5-mysql-1 mysql -uroot -p123456 -e "SELECT * FROM mydb.users"
 ```
 
 ✅ Você verá que o usuário **Maria** ainda está lá, confirmando a **persistência dos dados**! 🎉
