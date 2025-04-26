@@ -1,99 +1,102 @@
-## Compose sample application
-### React application with a NodeJS backend and a MySQL database
+# 💾 Criando e Utilizando Volumes para Persistência de Dados
 
-Project structure:
-```
-.
-├── backend
-│   ├── Dockerfile
-│   ...
-├── db
-│   └── password.txt
-├── compose.yaml
-├── frontend
-│   ├── ...
-│   └── Dockerfile
-└── README.md
+Neste exercício, você irá executar um container **MySQL** com volumes Docker, garantindo que os dados do banco sejam persistidos mesmo que o container seja removido.
+
+---
+
+## 📥 1. Baixe o projeto de exemplo
+
+Clone o repositório com uma stack pronta: **React + Express + MySQL**
+
+```bash
+git clone https://github.com/docker/awesome-compose.git
+cd awesome-compose/react-express-mysql
 ```
 
-[_compose.yaml_](compose.yaml)
-```
+---
+
+## ⚙️ 2. Configure o volume no `docker-compose.yml`
+
+Adicione a seção de volumes no serviço `mysql` para persistir os dados no host.
+
+```yaml
+version: '3.8'
+
 services:
-  backend:
-    build: backend
-    ports:
-      - 80:80
-      - 9229:9229
-      - 9230:9230
-    ...
-  db:
-    # We use a mariadb image which supports both amd64 & arm64 architecture
-    image: mariadb:10.6.4-focal
-    # If you really want to use MySQL, uncomment the following line
-    #image: mysql:8.0.27
-    ...
   frontend:
-    build: frontend
+    build: ./frontend
     ports:
-    - 3000:3000
-    ...
-```
-The compose file defines an application with three services `frontend`, `backend` and `db`.
-When deploying the application, docker compose maps port 3000 of the frontend service container to port 3000 of the host as specified in the file.
-Make sure port 3000 on the host is not already being in use.
+      - "3000:3000"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    # ...
 
-> ℹ️ **_INFO_**  
-> For compatibility purpose between `AMD64` and `ARM64` architecture, we use a MariaDB as database instead of MySQL.  
-> You still can use the MySQL image by uncommenting the following line in the Compose file   
-> `#image: mysql:8.0.27`
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    # ...
 
-## Deploy with docker compose
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=mydb
+    volumes:
+      - mysql_data:/var/lib/mysql
 
-```
-$ docker compose up -d
-Creating network "react-express-mysql_default" with the default driver
-Building backend
-Step 1/16 : FROM node:10
- ---> aa6432763c11
-...
-Successfully tagged react-express-mysql_frontend:latest
-WARNING: Image for service frontend was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
-Creating react-express-mysql_db_1 ... done
-Creating react-express-mysql_backend_1 ... done
-Creating react-express-mysql_frontend_1 ... done
-```
-
-## Expected result
-
-Listing containers must show containers running and the port mapping as below:
-```
-$ docker ps
-CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS                   PORTS                                                  NAMES
-f3e1183e709e        react-express-mysql_frontend   "docker-entrypoint.s…"   8 minutes ago       Up 8 minutes             0.0.0.0:3000->3000/tcp                                 react-express-mysql_frontend_1
-9422da53da76        react-express-mysql_backend    "docker-entrypoint.s…"   8 minutes ago       Up 8 minutes (healthy)   0.0.0.0:80->80/tcp, 0.0.0.0:9229-9230->9229-9230/tcp   react-express-mysql_backend_1
-a434bce6d2be        mysql:8.0.19                   "docker-entrypoint.s…"   8 minutes ago       Up 8 minutes             3306/tcp, 33060/tcp                                    react-express-mysql_db_1
+volumes:
+  mysql_data:
 ```
 
-After the application starts, navigate to `http://localhost:3000` in your web browser.
+---
 
-![page](./output.png)
+## 🛠️ 3. Usar o terminal do MySQL diretamente
 
+Acesse o terminal do banco de dados dentro do container:
 
-The backend service container has the port 80 mapped to 80 on the host.
+```bash
+docker exec -it exercicio5-mysql-1 mysql -uroot -p123456
 ```
-$ curl localhost:80
-{"message":"Hello from MySQL 8.0.19"}
+
+No prompt SQL:
+
+```sql
+USE mydb;
+INSERT INTO users (name) VALUES ('Maria');
+SELECT * FROM users;
 ```
 
-Stop and remove the containers
-```
-$ docker compose down
-Stopping react-express-mysql_frontend_1 ... done
-Stopping react-express-mysql_backend_1  ... done
-Stopping react-express-mysql_db_1       ... done
-Removing react-express-mysql_frontend_1 ... done
-Removing react-express-mysql_backend_1  ... done
-Removing react-express-mysql_db_1       ... done
-Removing network react-express-mysql_default
+Para sair, use:
 
+```sql
+exit;
 ```
+
+---
+
+## 🧪 4. Testar a persistência de dados
+
+### a. Remova o container MySQL (os dados ficarão no volume):
+
+```bash
+docker rm -f mysql
+```
+
+### b. Suba novamente apenas o serviço do MySQL:
+
+```bash
+docker-compose up -d mysql
+```
+
+### c. Verifique os dados:
+
+```bash
+docker exec -it mysql mysql -uroot -p123456 -e "SELECT * FROM mydb.users"
+```
+
+✅ Você verá que o usuário **Maria** ainda está lá, confirmando a **persistência dos dados**! 🎉
